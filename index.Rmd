@@ -1,0 +1,86 @@
+---
+title       : Predict brain weight over body weight
+subtitle    : simple brain weight prediction application
+author      : Bui Dinh Ngoc
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : standalone # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+
+## Predict brain weight over body weight
+
+1. Getting data
+2. Build predictive model
+3. Build Shiny App
+
+---
+
+## Getting data
+I using data from scg.sdsu.edu 
+
+```{r}
+
+data <- read.table("http://scg.sdsu.edu/wp-content/uploads/2013/09/brain_body.txt", 
+                   skip = 12, 
+                   header = TRUE)
+
+
+```
+
+--- .nobackground .quote
+
+## Build predictive model
+I using Linear Regression  with log function to get best fit .
+```{r simple-plot, fig.height = 4, fig.align = 'center', message = F}
+library(ggplot2)
+fit  <- lm(Brain_Weight ~ log(Body_Weight), data = data)
+predictions <- predict(fit, data)
+p<-ggplot(data, aes(x = Body_Weight, y = Brain_Weight)) + 
+  geom_point() +stat_smooth(method = "lm", col = "red")
+p + geom_vline(xintercept =  input$Body_Weight, colour="green",size=1 )
+```
+
+---
+
+## Build Shiny App
+
+I choose 1 slide and 1 main content layout
+
+```{r cache=FALSE}
+# ui.R
+library(shiny)
+
+# Define UI for application that draws a histogram
+shinyUI(fluidPage(
+  
+  # Application title
+  titlePanel(" Predict brain weight over body weight"),
+  
+  h3(textOutput("Brain_Weight")),
+  # Sidebar with a slider input for the number of bins
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("Body_Weight",
+                  "Body_Weight",
+                  min = 1,
+                  max = 500,
+                  value = 30)
+    ),   
+    
+    # Show a plot 
+    mainPanel(
+      plotOutput("distPlot")
+    )
+  )
+))
+
+```
+---
+
+
+
